@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { Project } from './types/project';
+import { useNavigate } from 'react-router-dom';
+import type { Project } from '../types/project';
 
 function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
+    const navigate = useNavigate();
+
     // State variables — React watches these and re-renders the page when they change
     const [projects, setProjects] = useState<Project[]>([]); // the list of projects shown on screen
     const [pageSize, setPageSize] = useState<number>(10);    // how many results per page
@@ -55,6 +58,7 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
                             <li><b>Phase: </b>{p.projectPhase}</li>
                             <li><b>Status: </b>{p.projectFunctionalityStatus}</li>
                         </ul>
+                        <button className="btn btn-success" onClick={() => navigate(`/donate/${p.projectName}/${p.projectId}`)}>Donate</button>
                     </div>
                 </div>
             ))}
