@@ -1,18 +1,36 @@
 import { useState, useEffect } from 'react';
 import type { Project } from './types/project';
+import { fetchProjects } from './api/projects.api';
+import Pagination from './components/Pagination';
 
 function ProjectList() {
     const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [pageSize, setPageSize] = useState<number>(9);
+    const [pageNum, setPageNum] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [selectedCategories] = useState<string[]>([]);
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            const response = await fetch('https://localhost:5000/api/water/get-all-projects');
-            const data = await response.json();
-            setProjects(data);
+        const loadProjects = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchProjects(pageSize, pageNum, selectedCategories);
+                setProjects(data.projects);
+                setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        fetchProjects();
-    }, []);
+        loadProjects();
+    }, [pageSize, pageNum, selectedCategories]);
+
+    if (loading) return <p>Loading projects...</p>;
+    if (error) return <p className="text-red-500">Error: {error}</p>;
 
     return (
         <>
@@ -30,6 +48,17 @@ function ProjectList() {
                     </ul>
                 </div>
             ))}
+
+            <Pagination
+                currentPage={pageNum}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                onPageChange={setPageNum}
+                onPageSizeChange={(newSize) => {
+                    setPageSize(newSize);
+                    setPageNum(1);
+                }}
+            />
         </>
     );
 }
