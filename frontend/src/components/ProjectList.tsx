@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import type { Project } from './types/project';
-import { fetchProjects } from './api/projects.api';
-import Pagination from './components/Pagination';
+import { useNavigate } from 'react-router-dom';
+import type { Project } from '../types/project';
+import { fetchProjects } from '../api/projects.api';
+import Pagination from './Pagination';
 
-function ProjectList() {
+function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [pageSize, setPageSize] = useState<number>(9);
     const [pageNum, setPageNum] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-    const [selectedCategories] = useState<string[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadProjects = async () => {
@@ -34,18 +35,24 @@ function ProjectList() {
 
     return (
         <>
-            <h1>Water Projects</h1>
-            <br />
             {projects.map((p) => (
-                <div id="project-card" key={p.projectId}>
-                    <h3>{p.projectName}</h3>
-                    <ul>
-                        <li>Project Type: {p.projectType}</li>
-                        <li>Regional Program: {p.projectRegionalProgram}</li>
-                        <li>Impact: {p.projectImpact} individuals served</li>
-                        <li>Phase: {p.projectPhase}</li>
-                        <li>Status: {p.projectFunctionalityStatus}</li>
-                    </ul>
+                <div className="card mb-3" key={p.projectId}>
+                    <div className="card-body">
+                        <h3 className="card-title">{p.projectName}</h3>
+                        <ul className="list-unstyled">
+                            <li>Project Type: {p.projectType}</li>
+                            <li>Regional Program: {p.projectRegionalProgram}</li>
+                            <li>Impact: {p.projectImpact} individuals served</li>
+                            <li>Phase: {p.projectPhase}</li>
+                            <li>Status: {p.projectFunctionalityStatus}</li>
+                        </ul>
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => navigate(`/donate/${p.projectName}/${p.projectId}`)}
+                        >
+                            Donate
+                        </button>
+                    </div>
                 </div>
             ))}
 

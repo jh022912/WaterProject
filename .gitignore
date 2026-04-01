@@ -5,6 +5,7 @@ publish/
 *.user
 *.suo
 .vs/
+appsettings.json
 *.db
 *.db-shm
 *.db-wal
